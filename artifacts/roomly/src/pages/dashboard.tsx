@@ -71,6 +71,13 @@ function formatExpenseDate(dateStr: string): string {
   }
 }
 
+function getGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good Morning";
+  if (hour < 18) return "Good Afternoon";
+  return "Good Evening";
+}
+
 export default function Dashboard() {
   const householdId = useHousehold();
 
@@ -149,17 +156,23 @@ export default function Dashboard() {
       <header className="flex justify-between items-end mb-10">
         <div>
           <p
-            className="font-medium mb-1"
-            style={{ color: "#8c7a6b" }}
-          >
-            Welcome home
-          </p>
-          <h1
-            className="text-3xl font-bold tracking-tight"
+            className="text-2xl font-bold mb-1"
             style={{ color: "#3c2a21" }}
           >
+            {getGreeting()}, Archita 👋
+          </p>
+          <p
+            className="text-base font-medium mb-3"
+            style={{ color: "#8c7a6b" }}
+          >
+            Here's what's happening in your household today.
+          </p>
+          <h2
+            className="text-lg font-semibold"
+            style={{ color: "#a89583" }}
+          >
             {household?.name ?? "Your Household"}
-          </h1>
+          </h2>
         </div>
         <div className="flex items-center gap-4">
           <a
@@ -419,22 +432,20 @@ function StatCard({
 }) {
   return (
     <div
-      className="p-6 rounded-[20px] border border-white shadow-sm flex flex-col"
+      className="p-8 rounded-[20px] border border-white shadow-sm flex flex-col"
       style={{ background: bgColor }}
     >
-      <div className="flex justify-between items-start mb-4">
+      <div className="flex justify-between items-start mb-5">
         <h3 className="font-medium text-sm" style={{ color: "#8c7a6b" }}>
           {title}
         </h3>
-        <div
-          className="p-2 bg-white rounded-xl shadow-sm"
-        >
+        <div className="p-2 bg-white rounded-xl shadow-sm">
           {icon}
         </div>
       </div>
       <div className="mt-auto">
         <div
-          className="text-3xl font-bold mb-1"
+          className="text-4xl font-bold mb-1.5"
           style={{ color: "#3c2a21" }}
         >
           {value}
