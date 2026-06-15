@@ -1,22 +1,39 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Roomly household management API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: households
+    description: Household management
+  - name: members
+    description: Household members
+  - name: rooms
+    description: Room management
+  - name: expenses
+    description: Shared expenses
+  - name: chores
+    description: Chore rotation
+  - name: rules
+    description: House rules and agreements
+  - name: payments
+    description: Rent payments
+  - name: dashboard
+    description: Summary and analytics
+  - name: landlord
+    description: Landlord/property manager views
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +41,1362 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # ── Households ─────────────────────────────────────────────────────────────
+  /households:
+    get:
+      operationId: listHouseholds
+      tags: [households]
+      summary: List all households
+      responses:
+        "200":
+          description: List of households
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Household"
+    post:
+      operationId: createHousehold
+      tags: [households]
+      summary: Create a household
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HouseholdInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Household"
+
+  /households/{householdId}:
+    get:
+      operationId: getHousehold
+      tags: [households]
+      summary: Get a household
+      parameters:
+        - name: householdId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Household
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Household"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateHousehold
+      tags: [households]
+      summary: Update a household
+      parameters:
+        - name: householdId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HouseholdUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Household"
+
+  # ── Members ────────────────────────────────────────────────────────────────
+  /households/{householdId}/members:
+    get:
+      operationId: listMembers
+      tags: [members]
+      summary: List household members
+      parameters:
+        - name: householdId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Members
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Member"
+    post:
+      operationId: addMember
+      tags: [members]
+      summary: Add a member
+      parameters:
+        - name: householdId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MemberInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Member"
+
+  /members/{memberId}:
+    patch:
+      operationId: updateMember
+      tags: [members]
+      summary: Update a member
+      parameters:
+        - name: memberId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MemberUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Member"
+    delete:
+      operationId: removeMember
+      tags: [members]
+      summary: Remove a member
+      parameters:
+        - name: memberId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Removed
+
+  # ── Rooms ─────────────────────────────────────────────────────────────────
+  /households/{householdId}/rooms:
+    get:
+      operationId: listRooms
+      tags: [rooms]
+      summary: List rooms in household
+      parameters:
+        - name: householdId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Rooms
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Room"
+    post:
+      operationId: createRoom
+      tags: [rooms]
+      summary: Create a room
+      parameters:
+        - name: householdId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoomInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+
+  /rooms/{roomId}:
+    patch:
+      operationId: updateRoom
+      tags: [rooms]
+      summary: Update a room
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoomUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+    delete:
+      operationId: deleteRoom
+      tags: [rooms]
+      summary: Delete a room
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  # ── Expenses ──────────────────────────────────────────────────────────────
+  /households/{householdId}/expenses:
+    get:
+      operationId: listExpenses
+      tags: [expenses]
+      summary: List household expenses
+      parameters:
+        - name: householdId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Expenses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Expense"
+    post:
+      operationId: createExpense
+      tags: [expenses]
+      summary: Log a shared expense
+      parameters:
+        - name: householdId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExpenseInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Expense"
+
+  /expenses/{expenseId}:
+    get:
+      operationId: getExpense
+      tags: [expenses]
+      summary: Get an expense
+      parameters:
+        - name: expenseId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Expense
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Expense"
+    patch:
+      operationId: updateExpense
+      tags: [expenses]
+      summary: Update an expense
+      parameters:
+        - name: expenseId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExpenseUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Expense"
+    delete:
+      operationId: deleteExpense
+      tags: [expenses]
+      summary: Delete an expense
+      parameters:
+        - name: expenseId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /expenses/{expenseId}/settle:
+    post:
+      operationId: settleExpense
+      tags: [expenses]
+      summary: Mark an expense as settled
+      parameters:
+        - name: expenseId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Settled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Expense"
+
+  # ── Chores ────────────────────────────────────────────────────────────────
+  /households/{householdId}/chores:
+    get:
+      operationId: listChores
+      tags: [chores]
+      summary: List chores for household
+      parameters:
+        - name: householdId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Chores
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Chore"
+    post:
+      operationId: createChore
+      tags: [chores]
+      summary: Create a chore
+      parameters:
+        - name: householdId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChoreInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Chore"
+
+  /chores/{choreId}:
+    patch:
+      operationId: updateChore
+      tags: [chores]
+      summary: Update a chore
+      parameters:
+        - name: choreId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChoreUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Chore"
+    delete:
+      operationId: deleteChore
+      tags: [chores]
+      summary: Delete a chore
+      parameters:
+        - name: choreId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /chores/{choreId}/complete:
+    post:
+      operationId: completeChore
+      tags: [chores]
+      summary: Mark a chore as completed
+      parameters:
+        - name: choreId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChoreCompletionInput"
+      responses:
+        "201":
+          description: Completion recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChoreCompletion"
+
+  /households/{householdId}/chores/schedule:
+    get:
+      operationId: getChoreSchedule
+      tags: [chores]
+      summary: Get the upcoming chore rotation schedule
+      parameters:
+        - name: householdId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Chore schedule
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ChoreScheduleItem"
+
+  # ── House Rules ───────────────────────────────────────────────────────────
+  /households/{householdId}/rules:
+    get:
+      operationId: getHouseRules
+      tags: [rules]
+      summary: Get the house rules document
+      parameters:
+        - name: householdId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: House rules
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HouseRules"
+    put:
+      operationId: updateHouseRules
+      tags: [rules]
+      summary: Update house rules document
+      parameters:
+        - name: householdId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HouseRulesInput"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HouseRules"
+
+  /households/{householdId}/rules/sign:
+    post:
+      operationId: signHouseRules
+      tags: [rules]
+      summary: Digitally sign the house rules
+      parameters:
+        - name: householdId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RuleSignatureInput"
+      responses:
+        "201":
+          description: Signed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RuleSignature"
+
+  # ── Payments ──────────────────────────────────────────────────────────────
+  /households/{householdId}/payments:
+    get:
+      operationId: listPayments
+      tags: [payments]
+      summary: List rent payments
+      parameters:
+        - name: householdId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Payments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Payment"
+    post:
+      operationId: recordPayment
+      tags: [payments]
+      summary: Record a rent payment
+      parameters:
+        - name: householdId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentInput"
+      responses:
+        "201":
+          description: Recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+
+  /payments/{paymentId}:
+    patch:
+      operationId: updatePayment
+      tags: [payments]
+      summary: Update a payment record
+      parameters:
+        - name: paymentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+
+  # ── Dashboard (wow endpoints) ─────────────────────────────────────────────
+  /households/{householdId}/dashboard:
+    get:
+      operationId: getHouseholdDashboard
+      tags: [dashboard]
+      summary: Get household dashboard summary
+      parameters:
+        - name: householdId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HouseholdDashboard"
+
+  /households/{householdId}/expenses/summary:
+    get:
+      operationId: getExpenseSummary
+      tags: [dashboard]
+      summary: Get expense breakdown by category
+      parameters:
+        - name: householdId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Expense summary
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ExpenseCategoryTotal"
+
+  /households/{householdId}/balances:
+    get:
+      operationId: getMemberBalances
+      tags: [dashboard]
+      summary: Get who owes what across all expenses
+      parameters:
+        - name: householdId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Member balances
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MemberBalance"
+
+  # ── Landlord ──────────────────────────────────────────────────────────────
+  /landlord/households:
+    get:
+      operationId: listLandlordHouseholds
+      tags: [landlord]
+      summary: List households managed by landlord
+      responses:
+        "200":
+          description: Households
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LandlordHousehold"
+
+  /landlord/households/{householdId}/payment-stats:
+    get:
+      operationId: getPaymentStats
+      tags: [landlord]
+      summary: Get on-time payment stats for a household
+      parameters:
+        - name: householdId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Payment stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentStats"
+
 components:
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
         status:
           type: string
-      required:
-        - status
 
+    # ── Household ─────────────────────────────────────────────────────────
+    Household:
+      type: object
+      required: [id, name, address, totalRent, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        address:
+          type: string
+        totalRent:
+          type: number
+        leaseStart:
+          type: ["string", "null"]
+        leaseEnd:
+          type: ["string", "null"]
+        landlordName:
+          type: ["string", "null"]
+        landlordEmail:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    HouseholdInput:
+      type: object
+      required: [name, address, totalRent]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        address:
+          type: string
+          minLength: 1
+        totalRent:
+          type: number
+          minimum: 0
+        leaseStart:
+          type: string
+        leaseEnd:
+          type: string
+        landlordName:
+          type: string
+        landlordEmail:
+          type: string
+
+    HouseholdUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        address:
+          type: string
+        totalRent:
+          type: number
+          minimum: 0
+        leaseStart:
+          type: string
+        leaseEnd:
+          type: string
+        landlordName:
+          type: string
+        landlordEmail:
+          type: string
+
+    # ── Member ────────────────────────────────────────────────────────────
+    Member:
+      type: object
+      required: [id, householdId, name, email, role, rentShare, moveInDate, createdAt]
+      properties:
+        id:
+          type: integer
+        householdId:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum: [admin, member]
+        rentShare:
+          type: number
+        avatarColor:
+          type: ["string", "null"]
+        roomId:
+          type: ["integer", "null"]
+        moveInDate:
+          type: string
+        createdAt:
+          type: string
+
+    MemberInput:
+      type: object
+      required: [name, email, rentShare]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        email:
+          type: string
+        role:
+          type: string
+          enum: [admin, member]
+          default: member
+        rentShare:
+          type: number
+          minimum: 0
+        avatarColor:
+          type: string
+        roomId:
+          type: integer
+        moveInDate:
+          type: string
+
+    MemberUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum: [admin, member]
+        rentShare:
+          type: number
+          minimum: 0
+        avatarColor:
+          type: string
+        roomId:
+          type: integer
+
+    # ── Room ──────────────────────────────────────────────────────────────
+    Room:
+      type: object
+      required: [id, householdId, name, monthlyRent, createdAt]
+      properties:
+        id:
+          type: integer
+        householdId:
+          type: integer
+        name:
+          type: string
+        monthlyRent:
+          type: number
+        description:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    RoomInput:
+      type: object
+      required: [name, monthlyRent]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        monthlyRent:
+          type: number
+          minimum: 0
+        description:
+          type: string
+
+    RoomUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        monthlyRent:
+          type: number
+          minimum: 0
+        description:
+          type: string
+
+    # ── Expense ───────────────────────────────────────────────────────────
+    Expense:
+      type: object
+      required: [id, householdId, title, amount, category, paidByMemberId, splitType, settled, date, createdAt]
+      properties:
+        id:
+          type: integer
+        householdId:
+          type: integer
+        title:
+          type: string
+        amount:
+          type: number
+        category:
+          type: string
+          enum: [groceries, utilities, internet, streaming, household, transport, other]
+        paidByMemberId:
+          type: integer
+        splitType:
+          type: string
+          enum: [equal, custom]
+        settled:
+          type: boolean
+        notes:
+          type: ["string", "null"]
+        date:
+          type: string
+        createdAt:
+          type: string
+        splits:
+          type: array
+          items:
+            $ref: "#/components/schemas/ExpenseSplit"
+
+    ExpenseSplit:
+      type: object
+      required: [id, expenseId, memberId, amount, paid]
+      properties:
+        id:
+          type: integer
+        expenseId:
+          type: integer
+        memberId:
+          type: integer
+        amount:
+          type: number
+        paid:
+          type: boolean
+
+    ExpenseInput:
+      type: object
+      required: [title, amount, category, paidByMemberId, splitType, date]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        amount:
+          type: number
+          minimum: 0
+        category:
+          type: string
+          enum: [groceries, utilities, internet, streaming, household, transport, other]
+        paidByMemberId:
+          type: integer
+        splitType:
+          type: string
+          enum: [equal, custom]
+        notes:
+          type: string
+        date:
+          type: string
+        customSplits:
+          type: array
+          items:
+            $ref: "#/components/schemas/CustomSplitItem"
+
+    CustomSplitItem:
+      type: object
+      required: [memberId, amount]
+      properties:
+        memberId:
+          type: integer
+        amount:
+          type: number
+
+    ExpenseUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        amount:
+          type: number
+          minimum: 0
+        category:
+          type: string
+          enum: [groceries, utilities, internet, streaming, household, transport, other]
+        notes:
+          type: string
+        date:
+          type: string
+
+    # ── Chore ─────────────────────────────────────────────────────────────
+    Chore:
+      type: object
+      required: [id, householdId, title, frequency, rotationOrder, currentAssigneeMemberId, createdAt]
+      properties:
+        id:
+          type: integer
+        householdId:
+          type: integer
+        title:
+          type: string
+        description:
+          type: ["string", "null"]
+        frequency:
+          type: string
+          enum: [daily, weekly, biweekly, monthly]
+        rotationOrder:
+          type: array
+          items:
+            type: integer
+        currentAssigneeMemberId:
+          type: integer
+        nextDueDate:
+          type: ["string", "null"]
+        lastCompletedAt:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    ChoreInput:
+      type: object
+      required: [title, frequency, rotationOrder, currentAssigneeMemberId]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        frequency:
+          type: string
+          enum: [daily, weekly, biweekly, monthly]
+        rotationOrder:
+          type: array
+          items:
+            type: integer
+        currentAssigneeMemberId:
+          type: integer
+        nextDueDate:
+          type: string
+
+    ChoreUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        frequency:
+          type: string
+          enum: [daily, weekly, biweekly, monthly]
+        rotationOrder:
+          type: array
+          items:
+            type: integer
+        currentAssigneeMemberId:
+          type: integer
+        nextDueDate:
+          type: string
+
+    ChoreCompletionInput:
+      type: object
+      required: [completedByMemberId]
+      properties:
+        completedByMemberId:
+          type: integer
+        notes:
+          type: string
+
+    ChoreCompletion:
+      type: object
+      required: [id, choreId, completedByMemberId, completedAt]
+      properties:
+        id:
+          type: integer
+        choreId:
+          type: integer
+        completedByMemberId:
+          type: integer
+        notes:
+          type: ["string", "null"]
+        completedAt:
+          type: string
+
+    ChoreScheduleItem:
+      type: object
+      required: [choreId, choreTitle, assigneeMemberId, assigneeName, dueDate, frequency]
+      properties:
+        choreId:
+          type: integer
+        choreTitle:
+          type: string
+        assigneeMemberId:
+          type: integer
+        assigneeName:
+          type: string
+        dueDate:
+          type: string
+        frequency:
+          type: string
+        overdue:
+          type: boolean
+
+    # ── House Rules ───────────────────────────────────────────────────────
+    HouseRules:
+      type: object
+      required: [id, householdId, content, version, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        householdId:
+          type: integer
+        content:
+          type: string
+        version:
+          type: integer
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        signatures:
+          type: array
+          items:
+            $ref: "#/components/schemas/RuleSignature"
+
+    HouseRulesInput:
+      type: object
+      required: [content]
+      properties:
+        content:
+          type: string
+          minLength: 1
+
+    RuleSignature:
+      type: object
+      required: [id, houseRulesId, memberId, memberName, signedAt]
+      properties:
+        id:
+          type: integer
+        houseRulesId:
+          type: integer
+        memberId:
+          type: integer
+        memberName:
+          type: string
+        signedAt:
+          type: string
+
+    RuleSignatureInput:
+      type: object
+      required: [memberId]
+      properties:
+        memberId:
+          type: integer
+
+    # ── Payment ───────────────────────────────────────────────────────────
+    Payment:
+      type: object
+      required: [id, householdId, memberId, amount, month, status, createdAt]
+      properties:
+        id:
+          type: integer
+        householdId:
+          type: integer
+        memberId:
+          type: integer
+        memberName:
+          type: string
+        amount:
+          type: number
+        month:
+          type: string
+        dueDate:
+          type: ["string", "null"]
+        paidDate:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [pending, paid, late, partial]
+        notes:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    PaymentInput:
+      type: object
+      required: [memberId, amount, month]
+      properties:
+        memberId:
+          type: integer
+        amount:
+          type: number
+          minimum: 0
+        month:
+          type: string
+        dueDate:
+          type: string
+        paidDate:
+          type: string
+        status:
+          type: string
+          enum: [pending, paid, late, partial]
+        notes:
+          type: string
+
+    PaymentUpdate:
+      type: object
+      properties:
+        amount:
+          type: number
+          minimum: 0
+        paidDate:
+          type: string
+        status:
+          type: string
+          enum: [pending, paid, late, partial]
+        notes:
+          type: string
+
+    # ── Dashboard ─────────────────────────────────────────────────────────
+    HouseholdDashboard:
+      type: object
+      required: [householdId, totalRent, memberCount, rentDueDate, currentMonthPayments, pendingExpenseTotal, overdueChores, upcomingChores, recentExpenses]
+      properties:
+        householdId:
+          type: integer
+        totalRent:
+          type: number
+        memberCount:
+          type: integer
+        rentDueDate:
+          type: ["string", "null"]
+        currentMonthPayments:
+          type: object
+          properties:
+            paid:
+              type: number
+            pending:
+              type: number
+            late:
+              type: number
+          required: [paid, pending, late]
+        pendingExpenseTotal:
+          type: number
+        overdueChores:
+          type: integer
+        upcomingChores:
+          type: integer
+        recentExpenses:
+          type: array
+          items:
+            $ref: "#/components/schemas/Expense"
+
+    ExpenseCategoryTotal:
+      type: object
+      required: [category, total, count]
+      properties:
+        category:
+          type: string
+        total:
+          type: number
+        count:
+          type: integer
+
+    MemberBalance:
+      type: object
+      required: [memberId, memberName, avatarColor, totalOwed, totalOwes, netBalance]
+      properties:
+        memberId:
+          type: integer
+        memberName:
+          type: string
+        avatarColor:
+          type: ["string", "null"]
+        totalOwed:
+          type: number
+        totalOwes:
+          type: number
+        netBalance:
+          type: number
+
+    # ── Landlord ──────────────────────────────────────────────────────────
+    LandlordHousehold:
+      type: object
+      required: [id, name, address, totalRent, memberCount, onTimeRate, currentMonthStatus]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        address:
+          type: string
+        totalRent:
+          type: number
+        memberCount:
+          type: integer
+        onTimeRate:
+          type: number
+        currentMonthStatus:
+          type: string
+          enum: [all_paid, partial, none_paid]
+
+    PaymentStats:
+      type: object
+      required: [householdId, totalPayments, onTimeCount, lateCount, onTimeRate, averageDaysLate, monthlyBreakdown]
+      properties:
+        householdId:
+          type: integer
+        totalPayments:
+          type: integer
+        onTimeCount:
+          type: integer
+        lateCount:
+          type: integer
+        onTimeRate:
+          type: number
+        averageDaysLate:
+          type: number
+        monthlyBreakdown:
+          type: array
+          items:
+            $ref: "#/components/schemas/MonthlyPaymentSummary"
+
+    MonthlyPaymentSummary:
+      type: object
+      required: [month, totalDue, totalPaid, onTime, late]
+      properties:
+        month:
+          type: string
+        totalDue:
+          type: number
+        totalPaid:
+          type: number
+        onTime:
+          type: integer
+        late:
+          type: integer
