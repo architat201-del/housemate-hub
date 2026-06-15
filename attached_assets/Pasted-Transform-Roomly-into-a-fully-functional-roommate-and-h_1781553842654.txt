@@ -1,0 +1,80 @@
+Transform Roomly into a fully functional roommate and household management application.
+
+Requirements:
+
+1. Authentication
+
+* Implement user registration, login, logout, and session management.
+* Store users securely with hashed passwords.
+* Protect all dashboard routes so only logged-in users can access them.
+
+2. Household Management
+
+* Allow users to create a household.
+* Allow users to join a household through an invite code or invite link.
+* Display all household members on the dashboard.
+
+3. Expense Management
+
+* Create Add Expense, Edit Expense, Delete Expense, and View Expense functionality.
+* Store expenses in the database.
+* Each expense should include:
+
+  * Title
+  * Amount
+  * Category
+  * Paid By
+  * Date
+  * Notes
+  * Status (Paid/Unpaid)
+
+4. Dashboard
+
+* Replace hardcoded values with real database data.
+* Automatically calculate:
+
+  * Total Rent
+  * Pending Expenses
+  * Number of Members
+  * Overdue Chores
+* Show recent expenses dynamically.
+
+5. Chore Management
+
+* Create, assign, edit, and delete chores.
+* Set due dates.
+* Mark chores as completed.
+* Automatically identify overdue chores.
+
+6. Rent Split Feature
+
+* Allow rent to be split equally among members.
+* Show each member's share.
+* Display payment status.
+
+7. Database
+
+* Create proper database tables for:
+
+  * Users
+  * Households
+  * Members
+  * Expenses
+  * Chores
+  * Rent Splits
+* Add relationships between tables.
+
+8. Analytics
+
+* Add a monthly expense trend chart.
+* Add a category breakdown pie chart.
+* Update charts automatically using real expense data.
+
+9. UI Improvements
+
+* Keep the existing Roomly design.
+* Add loading states, empty states, and error messages.
+* Make the application fully responsive on mobile, tablet, and desktop.
+
+10. Final Goal
+    Build the complete functionality step-by-step, testing each feature before moving to the next one. Do not generate mock data. Use real database integration throughout the application.

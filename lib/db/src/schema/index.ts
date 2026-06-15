@@ -5,3 +5,4 @@ export * from "./expenses";
 export * from "./chores";
 export * from "./rules";
 export * from "./payments";
+export * from "./users";

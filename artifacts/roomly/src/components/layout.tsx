@@ -7,7 +7,9 @@ import {
   ScrollText,
   Settings,
   Building2,
+  LogOut,
 } from "lucide-react";
+import { useAuth } from "@/context/auth-context";
 
 const NAV_ITEMS = [
   { href: "/", label: "Dashboard", icon: Home },
@@ -50,6 +52,28 @@ function NavLink({
     >
       {children}
     </Link>
+  );
+}
+
+function LogoutButton() {
+  const { logout } = useAuth();
+  return (
+    <button
+      onClick={() => logout()}
+      className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium w-full transition-colors"
+      style={{ color: "#a89583" }}
+      onMouseEnter={(e) => {
+        (e.currentTarget as HTMLElement).style.background = "#4a352a";
+        (e.currentTarget as HTMLElement).style.color = "#e5d5c5";
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLElement).style.background = "transparent";
+        (e.currentTarget as HTMLElement).style.color = "#a89583";
+      }}
+    >
+      <LogOut size={18} />
+      <span>Sign out</span>
+    </button>
   );
 }
 
@@ -105,6 +129,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <Building2 size={18} />
             <span>Landlord Portal</span>
           </NavLink>
+          <LogoutButton />
         </div>
       </aside>
 

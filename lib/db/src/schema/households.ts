@@ -11,6 +11,7 @@ export const householdsTable = pgTable("households", {
   leaseEnd: text("lease_end"),
   landlordName: text("landlord_name"),
   landlordEmail: text("landlord_email"),
+  inviteCode: text("invite_code").notNull().unique(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

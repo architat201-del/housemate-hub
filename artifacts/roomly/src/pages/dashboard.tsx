@@ -1,4 +1,5 @@
 import { useHousehold } from "@/components/household-context";
+import { useAuth } from "@/context/auth-context";
 import {
   useGetHouseholdDashboard,
   getGetHouseholdDashboardQueryKey,
@@ -80,6 +81,8 @@ function getGreeting(): string {
 
 export default function Dashboard() {
   const householdId = useHousehold();
+  const { user } = useAuth();
+  const firstName = user?.name?.split(" ")[0] ?? "there";
 
   const { data: household, isLoading: loadingHousehold } = useGetHousehold(
     householdId,
@@ -159,7 +162,7 @@ export default function Dashboard() {
             className="text-2xl font-bold mb-1"
             style={{ color: "#3c2a21" }}
           >
-            {getGreeting()}, Archita 👋
+            {getGreeting()}, {firstName} 👋
           </p>
           <p
             className="text-base font-medium mb-3"
