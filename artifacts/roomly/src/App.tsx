@@ -64,13 +64,13 @@ function ProtectedRouter() {
     <HouseholdProvider>
       <Layout>
         <Switch>
-          <Route path="/" component={Dashboard} />
           <Route path="/expenses" component={Expenses} />
           <Route path="/chores" component={Chores} />
           <Route path="/rent" component={Rent} />
           <Route path="/rules" component={Rules} />
           <Route path="/landlord" component={Landlord} />
           <Route path="/settings" component={Settings} />
+          <Route path="/" component={Dashboard} />
           <Route component={NotFound} />
         </Switch>
       </Layout>

@@ -1,5 +1,5 @@
 import { useState, FormEvent } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { useAuth } from "@/context/auth-context";
 
 export default function Login() {
@@ -121,13 +121,13 @@ export default function Login() {
 
           <p className="text-center mt-6 text-sm" style={{ color: "#8c7a6b" }}>
             New to Roomly?{" "}
-            <a
+            <Link
               href="/register"
               className="font-semibold hover:underline"
               style={{ color: "#c2410c" }}
             >
               Create an account
-            </a>
+            </Link>
           </p>
         </div>
       </div>

@@ -7,6 +7,18 @@ import { pool } from "@workspace/db";
 import router from "./routes";
 import { logger } from "./lib/logger";
 
+// Ensure the session table exists (connect-pg-simple's bundled SQL file isn't
+// reachable from the esbuild dist output, so we create it here instead).
+pool.query(`
+  CREATE TABLE IF NOT EXISTS "session" (
+    "sid" varchar NOT NULL,
+    "sess" json NOT NULL,
+    "expire" timestamp(6) NOT NULL,
+    CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE
+  );
+  CREATE INDEX IF NOT EXISTS "IDX_session_expire" ON "session" ("expire");
+`).catch((err: unknown) => logger.error({ err }, "Failed to ensure session table"));
+
 const PgSession = connectPgSimple(session);
 
 const app: Express = express();
@@ -45,7 +57,7 @@ app.use(
     store: new PgSession({
       pool,
       tableName: "session",
-      createTableIfMissing: true,
+      createTableIfMissing: false,
     }),
     name: "roomly.sid",
     secret: sessionSecret,

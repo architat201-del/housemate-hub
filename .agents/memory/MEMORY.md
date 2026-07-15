@@ -1,0 +1,1 @@
+- [connect-pg-simple session table](session-table-setup.md) — esbuild dist breaks table.sql lookup; create table via raw SQL + set createTableIfMissing:false.

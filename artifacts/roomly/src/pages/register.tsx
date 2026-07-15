@@ -1,5 +1,5 @@
 import { useState, FormEvent } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { useAuth } from "@/context/auth-context";
 
 export default function Register() {
@@ -132,13 +132,13 @@ export default function Register() {
 
           <p className="text-center mt-6 text-sm" style={{ color: "#8c7a6b" }}>
             Already have an account?{" "}
-            <a
+            <Link
               href="/login"
               className="font-semibold hover:underline"
               style={{ color: "#c2410c" }}
             >
               Sign in
-            </a>
+            </Link>
           </p>
         </div>
       </div>
