@@ -93,7 +93,7 @@ router.post("/households/:householdId/expenses", async (req, res) => {
           householdId,
           type: "expense" as const,
           title: `New expense: ${body.title}`,
-          message: `${payerName} paid $${body.amount.toFixed(2)} — your share is $${perPerson.toFixed(2)}`,
+          message: `${payerName} paid ₹${body.amount.toLocaleString("en-IN")} — your share is ₹${perPerson.toLocaleString("en-IN")}`,
         }));
       if (notifRows.length > 0) {
         await db.insert(notificationsTable).values(notifRows);

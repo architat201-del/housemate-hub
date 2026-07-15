@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Check, Receipt } from "lucide-react";
+import { formatINR } from "@/lib/currency";
 import { toast } from "sonner";
 import { CreateExpenseDialog } from "./create-expense-dialog";
 import {
@@ -180,12 +181,12 @@ export default function Expenses() {
                     <div>
                       <div className="font-medium text-sm">{balance.memberName}</div>
                       <div className="text-xs text-muted-foreground">
-                        Owes ${balance.totalOwes.toFixed(2)} · Owed ${balance.totalOwed.toFixed(2)}
+                        Owes {formatINR(balance.totalOwes)} · Owed {formatINR(balance.totalOwed)}
                       </div>
                     </div>
                   </div>
                   <div className={`text-sm font-bold tabular-nums ${balance.netBalance >= 0 ? "text-emerald-600" : "text-red-500"}`}>
-                    {balance.netBalance >= 0 ? "+" : ""}${balance.netBalance.toFixed(2)}
+                    {balance.netBalance >= 0 ? "+" : ""}{formatINR(Math.abs(balance.netBalance))}
                   </div>
                 </div>
               ))}
@@ -222,14 +223,14 @@ export default function Expenses() {
                     tickLine={false}
                     axisLine={false}
                     tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
-                    tickFormatter={(v) => `$${v}`}
+                    tickFormatter={(v) => `₹${Number(v).toLocaleString("en-IN")}`}
                     width={52}
                   />
                   <ChartTooltip
                     cursor={{ fill: "hsl(var(--muted))", radius: 4 }}
                     content={
                       <ChartTooltipContent
-                        formatter={(value) => [`$${Number(value).toFixed(2)}`, "Spending"]}
+                        formatter={(value) => [formatINR(Number(value)), "Spending"]}
                       />
                     }
                   />
@@ -249,7 +250,7 @@ export default function Expenses() {
           <CardHeader>
             <CardTitle className="text-lg">Spending by Category</CardTitle>
             <CardDescription>
-              {totalSpend > 0 ? `$${totalSpend.toFixed(2)} total across ${pieData.length} categories` : "All time"}
+              {totalSpend > 0 ? `${formatINR(totalSpend)} total across ${pieData.length} categories` : "All time"}
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col items-center">
@@ -281,7 +282,7 @@ export default function Expenses() {
                           return (
                             <div className="rounded-lg border bg-background px-3 py-2 shadow text-sm">
                               <div className="font-medium">{d.name}</div>
-                              <div className="text-muted-foreground">${Number(d.value).toFixed(2)}</div>
+                              <div className="text-muted-foreground">{formatINR(Number(d.value))}</div>
                             </div>
                           );
                         }}
@@ -344,7 +345,7 @@ export default function Expenses() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-bold tabular-nums">${item.total.toFixed(2)}</div>
+                      <div className="text-sm font-bold tabular-nums">{formatINR(item.total)}</div>
                       <div className="text-xs text-muted-foreground">{pct.toFixed(1)}%</div>
                     </div>
                   </div>
@@ -395,7 +396,7 @@ export default function Expenses() {
                       </div>
                     </TableCell>
                     <TableCell className="text-sm">{getMemberName(expense.paidByMemberId)}</TableCell>
-                    <TableCell className="text-right font-bold tabular-nums">${expense.amount.toFixed(2)}</TableCell>
+                    <TableCell className="text-right font-bold tabular-nums">{formatINR(expense.amount)}</TableCell>
                     <TableCell className="text-right">
                       <Badge
                         variant="outline"

@@ -7,6 +7,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Building2, TrendingUp, Users } from "lucide-react";
+import { formatINR } from "@/lib/currency";
 import { Badge } from "@/components/ui/badge";
 
 export default function Landlord() {
@@ -87,7 +88,7 @@ export default function Landlord() {
                 <div className="flex justify-between text-sm">
                   <div className="flex flex-col">
                     <span className="text-muted-foreground">Total Rent</span>
-                    <span className="font-semibold">${household.totalRent}</span>
+                    <span className="font-semibold">{formatINR(household.totalRent)}</span>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-muted-foreground">Tenants</span>

@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Trash2, Plus, Wallet } from "lucide-react";
+import { formatINR } from "@/lib/currency";
 import { toast } from "sonner";
 import { CreateRoomDialog } from "./create-room-dialog";
 import { RecordPaymentDialog } from "./record-payment-dialog";
@@ -79,7 +80,7 @@ export default function Rent() {
                     <div>
                       <div className="font-semibold">{room.name}</div>
                       <div className="text-sm text-muted-foreground">{room.description}</div>
-                      <div className="text-sm font-medium mt-1">${room.monthlyRent}/mo</div>
+                      <div className="text-sm font-medium mt-1">{formatINR(room.monthlyRent)}/mo</div>
                     </div>
                     <Button variant="ghost" size="icon" onClick={() => deleteRoomMutation.mutate({ roomId: room.id })}>
                       <Trash2 className="w-4 h-4 text-red-500" />
@@ -108,7 +109,7 @@ export default function Rent() {
                       </div>
                       <div className="font-medium">{member.name}</div>
                     </div>
-                    <div className="font-semibold text-lg">${member.rentShare}/mo</div>
+                    <div className="font-semibold text-lg">{formatINR(member.rentShare)}/mo</div>
                   </div>
                 ))}
               </div>
@@ -141,7 +142,7 @@ export default function Rent() {
                   <TableRow key={payment.id}>
                     <TableCell>{payment.month}</TableCell>
                     <TableCell>{payment.memberName}</TableCell>
-                    <TableCell>${payment.amount}</TableCell>
+                    <TableCell>{formatINR(payment.amount)}</TableCell>
                     <TableCell>
                       <Badge variant="outline" className={
                         payment.status === 'paid' ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400" :

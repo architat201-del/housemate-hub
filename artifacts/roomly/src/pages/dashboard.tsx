@@ -15,7 +15,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { format, parseISO } from "date-fns";
 import {
-  DollarSign,
+  IndianRupee,
   Receipt,
   AlertCircle,
   Users,
@@ -23,6 +23,7 @@ import {
   MoreHorizontal,
   Plus,
 } from "lucide-react";
+import { formatINR } from "@/lib/currency";
 
 const FALLBACK_COLORS = [
   "#c2410c",
@@ -49,14 +50,6 @@ function getMemberColor(
   return avatarColor || FALLBACK_COLORS[index % FALLBACK_COLORS.length];
 }
 
-function formatAmount(amount: number): string {
-  return amount.toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: amount % 1 === 0 ? 0 : 2,
-    maximumFractionDigits: 2,
-  });
-}
 
 function formatExpenseDate(dateStr: string): string {
   try {
@@ -210,18 +203,18 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
         <StatCard
           title="Total Rent"
-          value={formatAmount(dashboard?.totalRent ?? 0)}
+          value={formatINR(dashboard?.totalRent ?? 0)}
           subtitle={
             dashboard?.rentDueDate
               ? `Due ${format(parseISO(dashboard.rentDueDate), "MMM d")}`
               : "Due date not set"
           }
-          icon={<DollarSign size={20} style={{ color: "#d97706" }} />}
+          icon={<IndianRupee size={20} style={{ color: "#d97706" }} />}
           bgColor="#fff9f0"
         />
         <StatCard
           title="Pending Expenses"
-          value={formatAmount(dashboard?.pendingExpenseTotal ?? 0)}
+          value={formatINR(dashboard?.pendingExpenseTotal ?? 0)}
           subtitle="Awaiting settlement"
           icon={<Receipt size={20} style={{ color: "#c2410c" }} />}
           bgColor="#fff5f0"
@@ -387,7 +380,7 @@ export default function Dashboard() {
                       key={expense.id}
                       title={expense.title}
                       date={formatExpenseDate(expense.date)}
-                      amount={formatAmount(expense.amount)}
+                      amount={formatINR(expense.amount)}
                       paidByName={payer?.name?.split(" ")[0] ?? "Someone"}
                       paidByInitials={payer ? getInitials(payer.name) : "?"}
                       paidByColor={getMemberColor(payer?.avatarColor, payerIndex)}
