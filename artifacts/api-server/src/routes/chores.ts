@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { choresTable, choreCompletionsTable, membersTable } from "@workspace/db";
+import { choresTable, choreCompletionsTable, membersTable, notificationsTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import {
   ListChoresParams, CreateChoreParams, CreateChoreBody,
@@ -113,6 +113,49 @@ router.post("/chores/:choreId/complete", async (req, res) => {
         await db.update(choresTable).set({ lastCompletedAt: now.split("T")[0] }).where(eq(choresTable.id, choreId));
       }
     }
+
+    // Notify all household members about the completed chore
+    try {
+      if (chore) {
+        const rotation: number[] = (() => {
+          try { return JSON.parse(chore.rotationOrder); } catch { return []; }
+        })();
+
+        const allMembers = await db
+          .select({ id: membersTable.id, userId: membersTable.userId, name: membersTable.name })
+          .from(membersTable)
+          .where(eq(membersTable.householdId, chore.householdId));
+
+        const completer = allMembers.find((m) => m.id === body.completedByMemberId);
+        const completerName = completer?.name ?? "Someone";
+
+        // Figure out who is next assignee after rotation
+        let nextAssigneeName: string | null = null;
+        if (rotation.length > 1) {
+          const currentIdx = rotation.indexOf(chore.currentAssigneeMemberId);
+          const nextIdx = (currentIdx + 1) % rotation.length;
+          const nextId = rotation[nextIdx];
+          const nextMember = allMembers.find((m) => m.id === nextId);
+          nextAssigneeName = nextMember?.name ?? null;
+        }
+
+        const notifRows = allMembers
+          .filter((m) => m.userId != null && m.id !== body.completedByMemberId)
+          .map((m) => ({
+            userId: m.userId!,
+            householdId: chore.householdId,
+            type: "chore" as const,
+            title: `Chore completed: ${chore.title}`,
+            message: nextAssigneeName
+              ? `${completerName} marked it done. Up next: ${nextAssigneeName}.`
+              : `${completerName} marked it done.`,
+          }));
+
+        if (notifRows.length > 0) {
+          await db.insert(notificationsTable).values(notifRows);
+        }
+      }
+    } catch {}
 
     res.status(201).json({
       ...completion,
