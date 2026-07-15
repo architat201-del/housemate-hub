@@ -10,6 +10,7 @@ import rulesRouter from "./rules";
 import paymentsRouter from "./payments";
 import dashboardRouter from "./dashboard";
 import landlordRouter from "./landlord";
+import notificationsRouter from "./notifications";
 
 const router: IRouter = Router();
 
@@ -24,5 +25,6 @@ router.use(rulesRouter);
 router.use(paymentsRouter);
 router.use(dashboardRouter);
 router.use(landlordRouter);
+router.use(notificationsRouter);
 
 export default router;

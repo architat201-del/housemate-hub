@@ -6,3 +6,4 @@ export * from "./chores";
 export * from "./rules";
 export * from "./payments";
 export * from "./users";
+export * from "./notifications";

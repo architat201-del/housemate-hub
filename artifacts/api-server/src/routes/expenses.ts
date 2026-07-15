@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { expensesTable, expenseSplitsTable, membersTable } from "@workspace/db";
+import { expensesTable, expenseSplitsTable, membersTable, notificationsTable, usersTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import {
   ListExpensesParams, CreateExpenseParams, CreateExpenseBody,
@@ -78,6 +78,28 @@ router.post("/households/:householdId/expenses", async (req, res) => {
     }
 
     const full = await getExpenseWithSplits(expense.id);
+
+    // Notify all household members (except the payer) about the new expense
+    try {
+      const allMembers = await db.select({ id: membersTable.id, userId: membersTable.userId, name: membersTable.name })
+        .from(membersTable).where(eq(membersTable.householdId, householdId));
+      const paidByMember = allMembers.find((m) => m.id === body.paidByMemberId);
+      const payerName = paidByMember?.name ?? "Someone";
+      const perPerson = body.amount / (allMembers.length || 1);
+      const notifRows = allMembers
+        .filter((m) => m.userId != null && m.id !== body.paidByMemberId)
+        .map((m) => ({
+          userId: m.userId!,
+          householdId,
+          type: "expense" as const,
+          title: `New expense: ${body.title}`,
+          message: `${payerName} paid $${body.amount.toFixed(2)} — your share is $${perPerson.toFixed(2)}`,
+        }));
+      if (notifRows.length > 0) {
+        await db.insert(notificationsTable).values(notifRows);
+      }
+    } catch {}
+
     res.status(201).json(full);
   } catch (err) {
     req.log.error(err);

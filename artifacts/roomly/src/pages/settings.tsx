@@ -17,8 +17,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { Trash2, UserPlus, Save } from "lucide-react";
-import { useEffect } from "react";
+import { Trash2, Save, Copy, Check } from "lucide-react";
+import { useEffect, useState } from "react";
 import { AddMemberDialog } from "./add-member-dialog";
 
 const householdSchema = z.object({
@@ -30,6 +30,46 @@ const householdSchema = z.object({
   landlordName: z.string().optional(),
   landlordEmail: z.string().optional(),
 });
+
+function InviteCodeCard({ inviteCode }: { inviteCode?: string }) {
+  const [copied, setCopied] = useState(false);
+  if (!inviteCode) return null;
+  const handleCopy = () => {
+    navigator.clipboard.writeText(inviteCode).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Invite Code</CardTitle>
+        <CardDescription>Share this code so housemates can join your household.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="flex items-center gap-3">
+          <div
+            className="flex-1 font-mono text-2xl font-bold tracking-widest text-center py-4 rounded-xl"
+            style={{ background: "#f5ede3", color: "#3c2a21", letterSpacing: "0.3em" }}
+          >
+            {inviteCode}
+          </div>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handleCopy}
+            className="h-14 w-14 flex-shrink-0"
+          >
+            {copied ? <Check className="w-5 h-5 text-green-600" /> : <Copy className="w-5 h-5" />}
+          </Button>
+        </div>
+        <p className="text-xs text-muted-foreground mt-3">
+          Anyone with this code can join via the "Join household" screen after signing up.
+        </p>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function Settings() {
   const householdId = useHousehold();
@@ -108,6 +148,8 @@ export default function Settings() {
       </div>
 
       <div className="grid gap-8">
+        <InviteCodeCard inviteCode={(household as any)?.inviteCode} />
+
         <Card>
           <CardHeader>
             <CardTitle>Household Details</CardTitle>
