@@ -14,6 +14,7 @@ import {
 } from "@workspace/api-client-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format, parseISO } from "date-fns";
+import { Link } from "wouter";
 import {
   IndianRupee,
   Receipt,
@@ -49,7 +50,6 @@ function getMemberColor(
 ): string {
   return avatarColor || FALLBACK_COLORS[index % FALLBACK_COLORS.length];
 }
-
 
 function formatExpenseDate(dateStr: string): string {
   try {
@@ -171,7 +171,7 @@ export default function Dashboard() {
           </h2>
         </div>
         <div className="flex items-center gap-4">
-          <a
+          <Link
             href="/expenses"
             className="flex items-center gap-2 px-4 py-2.5 rounded-full font-medium transition-colors shadow-sm text-sm"
             style={{
@@ -187,7 +187,7 @@ export default function Dashboard() {
           >
             <Plus size={16} />
             <span>Add Expense</span>
-          </a>
+          </Link>
           {members[0] && (
             <div
               className="w-11 h-11 rounded-full flex items-center justify-center shadow-md font-bold text-sm text-white"
@@ -202,6 +202,7 @@ export default function Dashboard() {
       {/* Stat Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
         <StatCard
+          href="/rent"
           title="Total Rent"
           value={formatINR(dashboard?.totalRent ?? 0)}
           subtitle={
@@ -213,6 +214,7 @@ export default function Dashboard() {
           bgColor="#fff9f0"
         />
         <StatCard
+          href="/expenses"
           title="Pending Expenses"
           value={formatINR(dashboard?.pendingExpenseTotal ?? 0)}
           subtitle="Awaiting settlement"
@@ -220,6 +222,7 @@ export default function Dashboard() {
           bgColor="#fff5f0"
         />
         <StatCard
+          href="/chores"
           title="Overdue Chores"
           value={String(overdueCount)}
           subtitle={overdueCount > 0 ? firstOverdueChoreTitle : "All caught up"}
@@ -227,6 +230,7 @@ export default function Dashboard() {
           bgColor={overdueCount > 0 ? "#fef2f2" : "#f0fdf4"}
         />
         <StatCard
+          href="/settings"
           title="Members"
           value={String(dashboard?.memberCount ?? members.length)}
           subtitle="All active"
@@ -251,13 +255,13 @@ export default function Dashboard() {
               >
                 This Week's Chores
               </h2>
-              <a
+              <Link
                 href="/chores"
                 className="font-medium text-sm hover:underline"
                 style={{ color: "#c2410c" }}
               >
                 View Schedule
-              </a>
+              </Link>
             </div>
 
             {displayChores.length === 0 ? (
@@ -307,7 +311,7 @@ export default function Dashboard() {
                 />
               ))}
               <div className="flex flex-col items-center gap-3">
-                <a
+                <Link
                   href="/settings"
                   className="w-16 h-16 rounded-full border-2 border-dashed flex items-center justify-center transition-colors"
                   style={{
@@ -324,7 +328,7 @@ export default function Dashboard() {
                   }}
                 >
                   <Plus size={24} />
-                </a>
+                </Link>
                 <span
                   className="font-medium text-sm"
                   style={{ color: "#8c7a6b" }}
@@ -352,7 +356,8 @@ export default function Dashboard() {
               >
                 Recent Expenses
               </h2>
-              <button
+              <Link
+                href="/expenses"
                 className="p-2 rounded-full transition-colors"
                 style={{ color: "#8c7a6b" }}
                 onMouseEnter={(e) =>
@@ -363,7 +368,7 @@ export default function Dashboard() {
                 }
               >
                 <MoreHorizontal size={20} />
-              </button>
+              </Link>
             </div>
 
             <div className="space-y-5">
@@ -390,7 +395,7 @@ export default function Dashboard() {
               )}
             </div>
 
-            <a
+            <Link
               href="/expenses"
               className="block w-full mt-8 py-3 rounded-xl text-center font-medium transition-colors text-sm"
               style={{
@@ -405,7 +410,7 @@ export default function Dashboard() {
               }
             >
               View All Expenses
-            </a>
+            </Link>
           </section>
         </div>
       </div>
@@ -414,12 +419,14 @@ export default function Dashboard() {
 }
 
 function StatCard({
+  href,
   title,
   value,
   subtitle,
   icon,
   bgColor,
 }: {
+  href: string;
   title: string;
   value: string;
   subtitle: string;
@@ -427,9 +434,17 @@ function StatCard({
   bgColor: string;
 }) {
   return (
-    <div
-      className="p-8 rounded-[20px] border border-white shadow-sm flex flex-col"
-      style={{ background: bgColor }}
+    <Link
+      href={href}
+      className="p-8 rounded-[20px] border border-white shadow-sm flex flex-col group transition-shadow hover:shadow-md"
+      style={{ background: bgColor, textDecoration: "none" }}
+      onMouseEnter={(e) => {
+        (e.currentTarget as HTMLElement).style.filter = "brightness(0.97)";
+        (e.currentTarget as HTMLElement).style.cursor = "pointer";
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLElement).style.filter = "none";
+      }}
     >
       <div className="flex justify-between items-start mb-5">
         <h3 className="font-medium text-sm" style={{ color: "#8c7a6b" }}>
@@ -450,7 +465,7 @@ function StatCard({
           {subtitle}
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -471,11 +486,13 @@ function ChoreCard({
   const isCompleted = status === "completed";
 
   return (
-    <div
-      className="p-5 rounded-2xl relative overflow-hidden group hover:shadow-md transition-shadow"
+    <Link
+      href="/chores"
+      className="p-5 rounded-2xl relative overflow-hidden hover:shadow-md transition-shadow block"
       style={{
         background: isOverdue ? "#fef2f2" : "#faf7f2",
         border: `1px solid ${isOverdue ? "#fca5a5" : "#ebdcc9"}`,
+        textDecoration: "none",
       }}
     >
       {isCompleted && (
@@ -522,7 +539,7 @@ function ChoreCard({
           Overdue
         </p>
       )}
-    </div>
+    </Link>
   );
 }
 
